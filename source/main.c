@@ -22,52 +22,31 @@
 // builtin + lib headers here
 #include <raylib.h>
 #include <stdio.h>
+
 // custom headers
 #include "./game.h"
+#include "./terminal.h"
 
 const int screenWidth = 1280;
 const int screenHeight = 720;
 const char* title = "Terminal Hacker -- Become the best hacker!";
 
-
-
 int main(void) {
 	// Initialization
 	//--------------------------------------------------------------------------------------
-	Game game = InitGame(screenWidth, screenHeight, title);
+	SetTargetFPS(60); // Set our game to run at 60 frames-per-second
 
+	InitAudioDevice();
+
+	Game game = InitGame(screenWidth, screenHeight, title);
 	InitWindow(game.ScreenWidth, game.ScreenHeight, game.Title);
 
 	// Load assets
 
 	// Create terminal
-	Texture2D termText = LoadTexture("./resources/visuals/old_crt.png"); // 1440x1080
-	int termFrameWidth = termText.width;
-	int termFrameHeight = termText.height;
+	Terminal terminal = NewTerminal(game.ScreenWidth, game.ScreenHeight);
+	PlayTerminalMusic(terminal);
 
-	Rectangle termSource = { 0.0f, 0.0f, termFrameWidth, termFrameHeight };
-
-	Rectangle termDest = { screenWidth/2.0f, screenHeight/2.0f, 1280, 960 };
-	Vector2 termOrigin = { 638, 464 };
-
-	Texture2D screen = LoadTexture("./resources/visuals/old_crt_screen.png");
-	Rectangle screenSource = { 0.0f, 0.0f, termFrameWidth, termFrameHeight };
-	Rectangle screenDest = { screenWidth/2.0f, screenHeight/2.0f, 1280, 960 };
-	Vector2 screenOrigin = { 638, 464 };
-
-	Texture2D screenReflection = LoadTexture("./resources/visuals/old_crt_sreen_reflection_weak.png");
-
-
-	SetTargetFPS(60); // Set our game to run at 60 frames-per-second
-
-	InitAudioDevice();
-
-	Music music = LoadMusicStream("./resources/audio/digital_hum.wav");
-
-	music.looping = true;
-
-	SetMusicVolume(music, 0.25f);
-	PlayMusicStream(music);
 	//--------------------------------------------------------------------------------------
 	// Main game loop
 	while (!WindowShouldClose()) { // Detect window close button or ESC key
@@ -75,28 +54,25 @@ int main(void) {
 		//----------------------------------------------------------------------------------
 		// TODO: Update your variables here
 		//----------------------------------------------------------------------------------
-		if (GetKeyPressed() == 70) {
-			ToggleFullscreen();
-		}
+		
+		// TODO: Figure out FullScreen in debian?
 
-		UpdateMusicStream(music);
+		UpdateTerminalMusic(terminal);
 
 		// Draw
 		//----------------------------------------------------------------------------------
 		BeginDrawing();
-		ClearBackground(BLACK);
 
-		DrawTexturePro(screen, screenSource, screenDest, screenOrigin, 0.0f, WHITE);
-		DrawTexturePro(screenReflection, screenSource, screenDest, screenOrigin, 0.0f, WHITE);
-		DrawTexturePro(termText, termSource, termDest, termOrigin, 0.0f, WHITE);
-
+		ClearBackground(BLACK);	
+		DrawTerminal(terminal);	
+		
 		EndDrawing();
 		//----------------------------------------------------------------------------------
 	}
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------
-	UnloadMusicStream(music);
+	UnloadTerminal(terminal);
 	CloseAudioDevice();
 	CloseWindow();        // Close window and OpenGL context
 	//--------------------------------------------------------------------------------------

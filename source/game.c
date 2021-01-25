@@ -5,5 +5,5 @@ Game InitGame(int width, int height, const char* title) {
 	g.ScreenWidth = width;
 	g.ScreenHeight = height;
 	g.Title = title;
-	return g;	
-} 
+	return g;
+}
